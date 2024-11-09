@@ -1,0 +1,20 @@
+@startuml sequence_diagram
+actor Patient
+participant Register
+participant "Clinic Information System" as CIS
+participant Doctor
+participant SystemAdmin
+
+Patient -> Register: Request Appointment
+Register -> CIS: Check Doctor Availability
+CIS -> SystemAdmin: Request Doctor's Schedule
+SystemAdmin -> Doctor: Get Available Time Slots
+Doctor -> SystemAdmin: Provide Available Time Slots
+SystemAdmin -> CIS: Provide Available Time Slots
+CIS -> Register: Display Available Time Slots
+Register -> Patient: Provide Appointment Options
+Patient -> Register: Choose Appointment Time
+Register -> CIS: Create Appointment
+CIS -> Patient: Confirm Appointment
+Register -> Doctor: Notify Doctor of Appointment
+@enduml

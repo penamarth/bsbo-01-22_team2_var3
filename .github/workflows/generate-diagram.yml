@@ -1,0 +1,40 @@
+name: Generate UML Diagrams
+
+on:
+  push:
+    paths:
+      - '**/*.puml'  # Следим за изменениями любых .puml файлов в репозитории
+  pull_request:
+    paths:
+      - '**/*.puml'  # Следим за изменениями .puml файлов в pull request
+
+jobs:
+  generate-diagrams:
+    runs-on: ubuntu-latest  # Выбираем последнюю версию Ubuntu для выполнения
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2  # Загружаем содержимое репозитория
+
+      - name: Set up Java JDK
+        uses: actions/setup-java@v2  # Устанавливаем Java (необходима для работы с PlantUML)
+        with:
+          java-version: '11'  # Используем Java 11
+
+      - name: Install PlantUML
+        run: sudo apt-get install plantuml  # Устанавливаем PlantUML
+
+      - name: Generate UML diagrams from .puml files
+        run: |
+          # Генерируем все диаграммы в формате .png из файлов .puml
+          for file in $(find . -name "*.puml"); do
+            plantuml $file  # Генерируем изображение для каждого .puml файла
+          done
+
+      - name: Commit and push generated diagrams
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add '*.png'  # Добавляем все .png файлы с диаграммами
+          git commit -m "Generate UML diagrams"  # Создаем коммит с новыми изображениями
+          git push  # Отправляем изменения в репозиторий
