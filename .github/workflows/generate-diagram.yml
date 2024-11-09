@@ -3,38 +3,43 @@ name: Generate UML Diagrams
 on:
   push:
     paths:
-      - '**/*.puml'  # Следим за изменениями любых .puml файлов в репозитории
+      - '**/*.puml'
   pull_request:
     paths:
-      - '**/*.puml'  # Следим за изменениями .puml файлов в pull request
+      - '**/*.puml'
 
 jobs:
   generate-diagrams:
-    runs-on: ubuntu-latest  # Выбираем последнюю версию Ubuntu для выполнения
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2  # Загружаем содержимое репозитория
+        uses: actions/checkout@v2
 
-      - name: Set up Java JDK
-        uses: actions/setup-java@v2  # Устанавливаем Java (необходима для работы с PlantUML)
+      - name: Set up OpenJDK 17
+        uses: actions/setup-java@v2
         with:
-          java-version: '17'  # Используем Java 17
+          java-version: '17'
+          distribution: 'adoptopenjdk'
 
       - name: Install PlantUML
-        run: sudo apt-get install plantuml  # Устанавливаем PlantUML
+        run: sudo apt-get install plantuml
 
       - name: Generate UML diagrams from .puml files
         run: |
-          # Генерируем все диаграммы в формате .png из файлов .puml
           for file in $(find . -name "*.puml"); do
-            plantuml $file  # Генерируем изображение для каждого .puml файла
+            echo "Generating diagram for $file"
+            plantuml $file
+            echo "Generated diagram for $file"
           done
+
+      - name: Check git status before push
+        run: git status
 
       - name: Commit and push generated diagrams
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add '*.png'  # Добавляем все .png файлы с диаграммами
-          git commit -m "Generate UML diagrams"  # Создаем коммит с новыми изображениями
-          git push  # Отправляем изменения в репозиторий
+          git add '*.png' || echo "No .png files to add"
+          git commit -m "Generate UML diagrams" || echo "No changes to commit"
+          git push || echo "Push failed"
