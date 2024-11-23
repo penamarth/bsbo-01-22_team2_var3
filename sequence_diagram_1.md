@@ -1,3 +1,4 @@
+```plantuml
 @startuml sequence_diagram_1
 
 actor Patient
@@ -17,3 +18,4 @@ Schedule -> Doctor: Расписание добавляет доктору за�
 Appointment -> Patient: Передает информацию о записи пациенту
 
 @enduml
+```

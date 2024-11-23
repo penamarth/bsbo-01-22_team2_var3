@@ -1,3 +1,4 @@
+```plantuml
 @startuml sequence_diagram_2
 
 actor Patient
@@ -19,3 +20,4 @@ Schedule -> Doctor: Расписание обновляет данные о пр
 Schedule -> Patient: Пациент получает уведомление о новой записи alertAppointment(date, time, doctor)
 
 @enduml
+```
