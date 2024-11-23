@@ -1,3 +1,4 @@
+```plantuml
 @startuml sequence_diagram_2
 
 actor Doctor
@@ -13,3 +14,4 @@ MedicalRecord -> Doctor: Карта оповещает врача об успе�
 Doctor -> Patient: Карта отправляет сообщение пациенту с результатами приема message(is_ok)
 
 @enduml
+```
