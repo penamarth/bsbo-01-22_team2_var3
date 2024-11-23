@@ -1,3 +1,4 @@
+```plantuml
 @startuml use_case_diagram
 left to right direction
 
@@ -36,4 +37,4 @@ SystemAdmin -- GMH
 SystemAdmin -- RPS
 
 @enduml
-
+```
