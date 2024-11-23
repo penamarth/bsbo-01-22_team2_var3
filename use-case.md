@@ -3,7 +3,6 @@ left to right direction
 
 actor Patient
 actor Doctor
-actor Register
 actor SystemAdmin
 
 rectangle "Clinic Information System" {
@@ -23,10 +22,6 @@ Patient -- RPR
 Patient -- GMH
 Doctor -- RV
 Doctor -- GMH
-Register -- MA
-Register -- RV
-Register -- RPS
-Register -- MMR
 SystemAdmin -- MUA
 SystemAdmin -- RPR
 SystemAdmin -- MA

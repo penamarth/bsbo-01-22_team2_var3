@@ -1,4 +1,3 @@
-```plantuml
 @startuml class_diagram
 package "Clinic Information System" {
 
@@ -6,10 +5,14 @@ package "Clinic Information System" {
         + name : String
         + birthDate : Date
         + address : String
-        + medicalRecord : MedicalRecord
+        + medicalCard : MedicalRecord
         + makeAppointment()
         + viewMedicalRecord()
         + manageRecord()
+        + updatemedicalCard()
+        + updatePersonalData()
+        + alarmPatient()
+        + IsUpdateOk()
     }
 
     class Doctor {
@@ -17,25 +20,22 @@ package "Clinic Information System" {
         + specialty : String
         + schedule : Schedule
         + patients : List<Patient>
-        + appointmrnt : List<Appointment>
+        + appointment : List<Appointment>
         + recordVisit()
         + updateMedicalRecord()
+        + dropFreeWindows()
     }
 
     class MedicalRecord {
         + diagnosis : String
         + visitHistory : List<Visit>
-        + addVisit()
+        + addRecord()
         + updateRecord()
         + rewriteRecord()
         + viewRecord()
+        + message()
     }
 
-    class Visit {
-        + date : Date
-        + doctor : Doctor
-        + notes : String
-    }
 
     class Appointment {
         + date : Date
@@ -45,6 +45,7 @@ package "Clinic Information System" {
         + createAppointment()
         + cancelAppointment()
         + changeAppointment()
+        + alertAppointment()
     }
 
     class Schedule {
@@ -52,35 +53,35 @@ package "Clinic Information System" {
         + appointments : List<Appointment>
         + updateSchedule()
         + getAvailableTimeSlots()
+        + createAppointmentSchedule()
+        + addApointmentDoctor()
+        + dropAppoimtmentSchedule()
+    
     }
 
     class SystemAdmin {
         + managePatients()
-        + manageSchedules()
+        + updatePatients()
+        
     }
 
-    class Register {
-        + name : String
-        + registerPatient()
-        + updateAppointment()
-    }
 
     Patient "1" -- "many" MedicalRecord : has
+    Patient "1" -- "1" Schedule
     Doctor "1" -- "many" MedicalRecord : has
     Doctor "1" -- "many" Patient : attends
     
-    Doctor "1" -- "many" Visit : conducts
-    MedicalRecord "1" -- "many" Visit : contains
+
+
     Doctor "1" -- "1" Schedule : has
     Appointment "1" -- "1" Patient : schedules
     Appointment "many" -- "1" Doctor : schedules
     Schedule "1" -- "many" Appointment : includes
-    Register "1" -- "many" Appointment : manages
-    Register "1" -- "many" Patient : registers
+
     
     SystemAdmin "1" -- "many" Patient : manages 
-    SystemAdmin "1" -- "many" Schedule : manages  
+    SystemAdmin "1" -- "many" Schedule : manages 
+    SystemAdmin "1" -- "many" MedicalRecord : manages 
 
 }
 @enduml
-```
