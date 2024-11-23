@@ -1,3 +1,4 @@
+```plantuml
 @startuml sequence_diagram_2
 
 actor SystemAdmin
@@ -12,3 +13,4 @@ Patient -> Patient_Person: Класс пациент уведомляет пац
 
 
 @enduml
+```
