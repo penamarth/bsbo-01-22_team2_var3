@@ -15,7 +15,7 @@ SystemAdmin -> Patient: Администратор вносит изменени
 Patient -> SystemAdmin: Класс пациент уведомляет администратора об изменениях IsUpdateOk(is_ok)
 SystemAdmin -> Schedule: Класс администратор обращается к расписанию с уведомлением об изменениях alert_changes(is_ok)
 Schedule -> Patient: Расписание обращается к классу пациент с уведомлением об изменениях alert_changes(is_ok)
-Patient -> Patient_Person: Класс пациент уведомляет пациента об изменениях alarmPatient(is_ok_message)
+Patient -> Patient_Person_object: Класс пациент уведомляет пациента об изменениях alarmPatient(is_ok_message)
 
 
 @enduml
