@@ -1,3 +1,4 @@
+```plantuml
 @startuml class_diagram
 package "Clinic Information System" {
 
@@ -85,3 +86,4 @@ package "Clinic Information System" {
 
 }
 @enduml
+```
