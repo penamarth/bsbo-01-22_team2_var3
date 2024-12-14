@@ -1,170 +1,138 @@
 class Patient:
-    def __init__(self, name):
+    def __init__(self, name, birth_date, address):
         self.name = name
-        self.medical_record = None
+        self.birth_date = birth_date
+        self.address = address
+        self.medical_record = MedicalRecord(self)
 
-    def make_appointment(self, schedule, date, time, doctor):
-        print(f"Пациент {self.name}: Запрашиваю запись на {date}, {time} у {doctor}")
-        schedule.make_appointment(date, time, doctor, self)
-
-    def manage_record(self, schedule):
-        print(f"Пациент {self.name}: Обращаюсь к расписанию для управления записью")
-        schedule.manage_record(self)
-
-    def update_personal_data(self, type_of_change, change):
-        print(f"Пациент {self.name}: Обновляю личные данные: {type_of_change} -> {change}")
+    def update_personal_data(self, field, value):
+        setattr(self, field, value)
+        print(f"[Patient.update_personal_data] Обновлены данные: {field} -> {value}")
 
 
 class Doctor:
-    def __init__(self, name):
+    def __init__(self, name, specialty):
         self.name = name
-        self.appointments = []
+        self.specialty = specialty
+        self.schedule = []
 
-    def get_available_time_slots(self, schedule):
-        print(f"Врач {self.name}: Предоставляю доступные временные слоты")
-        # Здесь можно реализовать логику получения свободных временных слотов
-        available_slots = ["10:00", "11:00"]
-        schedule.drop_free_windows(available_slots)
-
-    def add_appointment_doctor(self, appointment):
-        print(f"Врач {self.name}: Добавляю запись к себе в расписание")
-        self.appointments.append(appointment)
-
-    def add_record_results(self, patient, results):
-        print(f"Врач {self.name}: Ввожу результаты приема для пациента {patient.name}")
-        if patient.medical_record is not None:
-            patient.medical_record.update_medical_record(results)
+    def add_appointment(self, appointment):
+        self.schedule.append(appointment)
+        print(f"[Doctor.add_appointment] Добавлена запись: {appointment.date} {appointment.time}")
 
 
 class MedicalRecord:
     def __init__(self, patient):
         self.patient = patient
-        self.data = {}
+        self.records = []
 
-    def update_medical_record(self, data):
-        print(f"Медицинская карта: Обновляем данные карты пациента {self.patient.name}")
-        self.data.update(data)
-        self.alert(True)
+    def add_record(self, record):
+        self.records.append(record)
+        print(f"[MedicalRecord.add_record] Добавлена запись: {record}")
 
-    def alert(self, is_ok):
-        print("Медицинская карта: Уведомление об успешном обновлении данных")
+    def update_record(self, record):
+        self.records[-1] = record
+        print(f"[MedicalRecord.update_record] Запись обновлена: {record}")
 
 
 class Appointment:
-    def __init__(self, date, time, doctor):
+    def __init__(self, date, time, doctor, patient):
         self.date = date
         self.time = time
         self.doctor = doctor
-        self.patient = None
-
-    def create_appointment_schedule(self, schedule, patient):
-        print(f"Запись: Создаем новую запись в расписании на {self.date}, {self.time} у {self.doctor}")
-        self.patient = patient  # Устанавливаем пациента для этой записи
-        schedule.create_appointment(self)
-
-    def alert_appointment(self):
-        print(f"Запись: Уведомляем пациента {self.patient.name} о создании записи")
+        self.patient = patient
 
 
 class Schedule:
     def __init__(self):
-        self.appointments = []
         self.patients = []
         self.doctors = []
+        self.appointments = []
 
-    def make_appointment(self, date, time, doctor, patient):
-        print("Расписание: Получаем запрос на создание записи")
-        appointment = Appointment(date, time, doctor)
-        appointment.create_appointment_schedule(self, patient)
+    def log(self, method_name, details):
+        print(f"[Schedule.{method_name}] {details}")
 
-    def manage_record(self, patient):
-        print("Расписание: Управляем записью пациента")
-        # Логика управления записью пациента
+    def add_doctor(self, name, specialty):
+        doctor = Doctor(name, specialty)
+        self.doctors.append(doctor)
+        self.log("add_doctor", f"Добавлен врач {name}, специализация: {specialty}")
 
-    def update_personal_data(self, patient, type_of_change, change):
-        print("Расписание: Обновляем личные данные пациента")
-        # Логика обновления личных данных пациента
-        patient.update_personal_data(type_of_change, change)
+    def register_patient(self, name, birth_date, address):
+        patient = Patient(name, birth_date, address)
+        self.patients.append(patient)
+        self.log("register_patient", f"Зарегистрирован пациент {name}")
 
-    def get_available_time_slots(self, doctor):
-        print("Расписание: Получаем доступные временные слоты у врача")
-        doctor.get_available_time_slots(self)
+    def make_appointment(self, patient_name, doctor_name, date, time):
+        self.log("make_appointment", f"Создание записи: пациент={patient_name}, врач={doctor_name}, дата={date}, время={time}")
+        patient = next((p for p in self.patients if p.name == patient_name), None)
+        doctor = next((d for d in self.doctors if d.name == doctor_name), None)
 
-    def drop_free_windows(self, time_slots):
-        print(f"Расписание: Получили свободные временные слоты: {', '.join(time_slots)}")
+        if not patient or not doctor:
+            print(f"[Schedule.make_appointment] Ошибка: пациент или врач не найден")
+            return
 
-    def create_appointment(self, appointment):
-        print("Расписание: Создаем новую запись")
+        appointment = Appointment(date, time, doctor, patient)
         self.appointments.append(appointment)
-        appointment.alert_appointment()
+        doctor.add_appointment(appointment)
+        self.log("make_appointment", f"Запись создана: {patient.name} -> {doctor.name} на {date} {time}")
 
-    def drop_appointment_schedule(self, patient, date, time, doctor):
-        print("Расписание: Удаляем старую запись")
-        # Логика удаления старой записи
+    def update_medical_record(self, patient_name, record):
+        self.log("update_medical_record", f"Обновление медкарты: пациент={patient_name}, запись={record}")
+        patient = next((p for p in self.patients if p.name == patient_name), None)
 
-    def add_appointment_doctor(self, date, time, doctor):
-        print("Расписание: Добавляем запись к доктору")
-        for doc in self.doctors:
-            if doc.name == doctor:
-                doc.add_appointment_doctor(Appointment(date, time, doctor))
+        if not patient:
+            print(f"[Schedule.update_medical_record] Пациент {patient_name} не найден")
+            return
 
+        patient.medical_record.add_record(record)
 
-class SystemAdmin:
-    def __init__(self):
-        pass
+    def update_personal_data(self, patient_name, field, value):
+        self.log("update_personal_data", f"Обновление данных пациента: {patient_name}, {field} -> {value}")
+        patient = next((p for p in self.patients if p.name == patient_name), None)
 
-    def manage_patients(self, patient_name):
-        print(f"Администратор: Управляем пациентом {patient_name}")
-        # Логика управления пациентом
+        if not patient:
+            print(f"[Schedule.update_personal_data] Пациент {patient_name} не найден")
+            return
 
-
-# Прецедент 1
-def presedent_1():
-    patient = Patient("Иван Иванов")
-    doctor = Doctor("Петр Петров")
-    schedule = Schedule()
-    schedule.doctors.append(doctor)
-
-    patient.make_appointment(schedule, "01-01-2023", "10:00", doctor.name)
+        patient.update_personal_data(field, value)
 
 
-# Прецедент 2
-def presedent_2():
-    patient = Patient("Иван Иванов")
-    medical_record = MedicalRecord(patient)
-    patient.medical_record = medical_record
-    doctor = Doctor("Петр Петров")
-    schedule = Schedule()
-    schedule.doctors.append(doctor)
+# Прецеденты
 
-    doctor.add_record_results(patient, {"result": "Здоров"})
+def presedent_1(schedule):
+    schedule.log("presedent_1", "Начало прецедента")
+    schedule.register_patient("Иван Иванов", "01-01-1990", "ул. Ленина, д. 1")
+    schedule.add_doctor("Петр Петров", "Терапевт")
+    schedule.make_appointment("Иван Иванов", "Петр Петров", "01-01-2023", "10:00")
+    schedule.log("presedent_1", "Конец прецедента")
 
+def presedent_2(schedule):
+    schedule.log("presedent_2", "Начало прецедента")
+    schedule.register_patient("Иван Иванов", "01-01-1990", "ул. Ленина, д. 1")
+    schedule.update_medical_record("Иван Иванов", "Обследование: Здоров")
+    schedule.log("presedent_2", "Конец прецедента")
 
-# Прецедент 3
-def presedent_3():
-    patient = Patient("Иван Иванов")
-    doctor = Doctor("Петр Петров")
-    schedule = Schedule()
-    schedule.doctors.append(doctor)
+def presedent_3(schedule):
+    schedule.log("presedent_3", "Начало прецедента")
+    schedule.register_patient("Иван Иванов", "01-01-1990", "ул. Ленина, д. 1")
+    schedule.update_medical_record("Иван Иванов", "Результаты анализов: Отклонений нет")
+    schedule.log("presedent_3", "Конец прецедента")
 
-    patient.manage_record(schedule)
-
-
-# Прецедент 4
-def presedent_4():
-    patient = Patient("Иван Иванов")
-    system_admin = SystemAdmin()
-    schedule = Schedule()
-
-    patient.update_personal_data("ФИО", "Иванов Иван Иванович")
+def presedent_4(schedule):
+    schedule.log("presedent_4", "Начало прецедента")
+    schedule.register_patient("Иван Иванов", "01-01-1990", "ул. Ленина, д. 1")
+    schedule.update_personal_data("Иван Иванов", "address", "ул. Советская, д. 2")
+    schedule.log("presedent_4", "Конец прецедента")
 
 
 if __name__ == "__main__":
+    schedule = Schedule()
+
     print("1.")
-    presedent_1()
+    presedent_1(schedule)
     print("2.")
-    presedent_2()
+    presedent_2(schedule)
     print("3.")
-    presedent_3()
+    presedent_3(schedule)
     print("4.")
-    presedent_4()
+    presedent_4(schedule)
